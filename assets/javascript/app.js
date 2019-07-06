@@ -2,19 +2,20 @@
 //cNYBdM1HCGn3LmnNf4GJmk8Hm0BUNp5L
 
 //variable for array to create buttons to start out with
-var topics = ["Star Wars", "Grizzlies", "Food", "Ghost Rider", "Wolverine"];
+var topics = ["Kylo Ren", "Grizzlies", "Food", "Ghost Rider", "Captain America"];
+var results;
 
 // 
 //function to display gifs
 function displayGifs() {
     var topic = $(this).attr('data-name');
     var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + topic + "&api_key=cNYBdM1HCGn3LmnNf4GJmk8Hm0BUNp5L&limit=10";
-
+    
     $.ajax({
         url: queryURL,
         method: 'GET'
     }).then(function (response) {
-        var results = response.data
+        results = response.data
         for (var i = 0; i < results.length; i++) {
 
             // Only taking action if the photo has an appropriate rating
@@ -34,7 +35,14 @@ function displayGifs() {
 
                 // Giving the image tag an src attribute of a proprty pulled off the
                 // result item
-                gifImage.attr('src', results[i].images.fixed_height.url);
+                gifImage.attr('src', results[i].images.fixed_height_still.url);
+
+                //add class to gif
+                gifImage.addClass('image-gif');
+
+                //attribute to give still
+                gifImage.attr('data-state','still');
+                gifImage.attr('data-position',i);
 
                 // Appending the paragraph and personImage we created to the "gifDiv" div we created
                 gifDiv.append(gifImage);
@@ -76,7 +84,21 @@ $("#searchBtn").on("click", function(event) {
     createTopics();
 });
 
+function animate(){
+    var state = $(this).attr('data-state');
+    var position = $(this).attr('data-position');
+    if (state === 'still')
+    {
+        $(this).attr('src', results[position].images.fixed_height.url);
+        $(this).attr('data-state','animate');
+    } else{
+        $(this).attr('src', results[position].images.fixed_height_still.url);
+        $(this).attr('data-state','still');
+    }
+}
+
 //adds on click event for all buttons with gifTopic class
 $(document).on("click", ".gif", displayGifs);
+$(document).on("click", ".image-gif", animate);
 
 createTopics();
